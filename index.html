@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Next Decade - Chapter by Chapter</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            color: #fff;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .header {
+            text-align: center;
+            padding: 40px 20px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 20px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            color: #e94560;
+        }
+        .subtitle {
+            font-size: 1.2em;
+            color: rgba(255,255,255,0.8);
+            margin-bottom: 15px;
+        }
+        .author {
+            color: rgba(255,255,255,0.6);
+            font-size: 1em;
+        }
+        .player-container {
+            background: rgba(0,0,0,0.3);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        audio {
+            width: 100%;
+            height: 50px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+        .chapter-list {
+            background: rgba(255,255,255,0.05);
+            border-radius: 15px;
+            padding: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .chapter-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            margin: 10px 0;
+            background: rgba(0,0,0,0.2);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        .chapter-item:hover {
+            background: rgba(233,69,96,0.2);
+            border-color: #e94560;
+            transform: translateX(5px);
+        }
+        .chapter-item.active {
+            background: rgba(233,69,96,0.3);
+            border-color: #e94560;
+        }
+        .chapter-number {
+            width: 40px;
+            height: 40px;
+            background: #e94560;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+        .chapter-info {
+            flex: 1;
+        }
+        .chapter-title {
+            font-size: 1.1em;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        .chapter-time {
+            font-size: 0.85em;
+            color: rgba(255,255,255,0.6);
+        }
+        .chapter-duration {
+            font-size: 0.85em;
+            color: rgba(255,255,255,0.6);
+            margin-left: 10px;
+        }
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 15px 0;
+        }
+        .btn {
+            background: #e94560;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(233,69,96,0.4);
+        }
+        .btn-secondary {
+            background: transparent;
+            border: 2px solid #e94560;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 3px;
+            margin: 15px 0;
+            cursor: pointer;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #e94560, #ff6b6b);
+            border-radius: 3px;
+            width: 0%;
+            transition: width 0.1s;
+        }
+        .time-display {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85em;
+            color: rgba(255,255,255,0.7);
+            margin-top: 5px;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            font-size: 0.85em;
+            color: rgba(255,255,255,0.6);
+        }
+        .part-indicator {
+            text-align: center;
+            padding: 10px;
+            background: rgba(233,69,96,0.2);
+            border-radius: 10px;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📖 The Next Decade</h1>
+            <p class="subtitle">Chapter by Chapter Audiobook</p>
+            <p class="author">Written by Shelly Gee | Concept by Joe Gomes</p>
+        </div>
+        
+        <div class="player-container">
+            <div class="part-indicator" id="partIndicator">Click a chapter below to start</div>
+            <audio id="audioPlayer" controls></audio>
+            <div class="progress-bar" id="progressBar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="time-display">
+                <span id="currentTime">0:00:00</span>
+                <span id="duration">0:00:00</span>
+            </div>
+            <div class="controls">
+                <button class="btn" id="playBtn">▶ Play</button>
+                <button class="btn btn-secondary" id="pauseBtn">⏸ Pause</button>
+                <button class="btn btn-secondary" id="prevBtn">⏮ Previous</button>
+                <button class="btn btn-secondary" id="nextBtn">⏭ Next</button>
+            </div>
+        </div>
+        
+        <div class="chapter-list">
+            <div class="chapter-item" data-part="1" data-time="0" onclick="jumpToChapter(0)">
+                <div class="chapter-number">I</div>
+                <div class="chapter-info">
+                    <div class="chapter-title">Introduction: Standing at the Threshold</div>
+                    <div class="chapter-time">Part 1 • 0:00:00</div>
+                </div>
+                <div class="chapter-duration">~20 min</div>
+            </div>
+            
+            <div class="chapter-item" data-part="1" data-time="1200" onclick="jumpToChapter(1)">
+                <div class="chapter-number">1</div>
+                <div class="chapter-info">
+                    <div class="chapter-title">The Intelligence Revolution - AI and AGI</div>
+                    <div class="chapter-time">Part 1 • 0:20:00</div>
+                </div>
+                <div class="chapter-duration">~25 min</div>
+            </div>
+            
+            <div class="chapter-item" data-part="1" data-time="2700" onclick="jumpToChapter(2)">
+                <div class="chapter-number">2</div>
+                <div class="chapter-info">
+                    <div class="chapter-title">The Rise of the Machines - Robotics</div>
+                    <div class="chapter-time">Part 1 • 0:45:00</div>
+                </div>
+                <div class="chapter-duration">~20 min</div>
+            </div>
+            
+            <div class="chapter-item" data-part="1" data-time="3900" onclick="jumpToChapter(3)">
+                <div class="chapter-number">3</div>
+                <div class="chapter-info">
+                    <div class="chapter-title">The End of Driving - Autonomous Vehicles</div>
+                    <div class="chapter-time">Part 1 • 1:05:00</div>
+                </div>
+                <div class="chapter-duration">~20 min</div>
+            </div>
+            
+            <div class="chapter-item" data-part="1" data-time="5100" onclick="jumpToChapter(4)">
+                <div class="chapter-number">4</div>
+                <div class="chapter-info">
+                    <div class="chapter-title">Skies of Tomorrow - Drones</div>
+                    <div class="chapter-time">Part 1 • 1:25:00</div>
+                </div>
+                <div class="chapter-duration">~20 min</div>
+            </div>
+            
+            <div class="chapter-item" data-part="2" data-time="0" onclick="jumpToChapter(5)">
+                <div class="chapter-number">5</div>
+                <div class="chapter-info">
+                    <div class="chapter-title">Defeating Death - Medicine & Longevity</div>
+                    <div class="chapter-time">Part 2 • 0:00:00</div>
+                </div>
+                <div class="chapter-duration">~25 min</div>
+            </div>
+            
+            <div class="chapter-item" data-part="2" data-time="1500" onclick="jumpToChapter(6)">
+                <div class="chapter-number">6</div>
+                <div class="chapter-info">
+                    <div class="chapter-title">The Invisible World - Nanotechnology</div>
+                    <div class="chapter-time">Part 2 • 0:25:00</div>
+                </div>
+                <div class="chapter-duration">~20 min</div>
+            </div>
+            
+            <div class="chapter-item" data-part="2" data-time="2700" onclick="jumpToChapter(7)">
+                <div class="chapter-number">7</div>
+                <div class="chapter-info">
+                    <div class="chapter-title">Computing Reality - Quantum Computers</div>
+                    <div class="chapter-time">Part 2 • 0:45:00</div>
+                </div>
+                <div class="chapter-duration">~20 min</div>
+            </div>
+            
+            <div class="chapter-item" data-part="2" data-time="3900" onclick="jumpToChapter(8)">
+                <div class="chapter-number">8</div>
+                <div class="chapter-info">
+                    <div class="chapter-title">Powering Civilization - Energy</div>
+                    <div class="chapter-time">Part 2 • 1:05:00</div>
+                </div>
+                <div class="chapter-duration">~20 min</div>
+            </div>
+            
+            <div class="chapter-item" data-part="2" data-time="5100" onclick="jumpToChapter(9)">
+                <div class="chapter-number">9</div>
+                <div class="chapter-info">
+                    <div class="chapter-title">Beyond Earth - Space Exploration</div>
+                    <div class="chapter-time">Part 2 • 1:25:00</div>
+                </div>
+                <div class="chapter-duration">~20 min</div>
+            </div>
+            
+            <div class="chapter-item" data-part="3" data-time="0" onclick="jumpToChapter(10)">
+                <div class="chapter-number">10</div>
+                <div class="chapter-info">
+                    <div class="chapter-title">Mind Meets Machine - Brain-Computer Interfaces</div>
+                    <div class="chapter-time">Part 3 • 0:00:00</div>
+                </div>
+                <div class="chapter-duration">~25 min</div>
+            </div>
+            
+            <div class="chapter-item" data-part="3" data-time="1500" onclick="jumpToChapter(11)">
+                <div class="chapter-number">11</div>
+                <div class="chapter-info">
+                    <div class="chapter-title">The Convergence - When Technologies Collide</div>
+                    <div class="chapter-time">Part 3 • 0:25:00</div>
+                </div>
+                <div class="chapter-duration">~20 min</div>
+            </div>
+            
+            <div class="chapter-item" data-part="3" data-time="2700" onclick="jumpToChapter(12)">
+                <div class="chapter-number">12</div>
+                <div class="chapter-info">
+                    <div class="chapter-title">Society Transformed - Living in 2036</div>
+                    <div class="chapter-time">Part 3 • 0:45:00</div>
+                </div>
+                <div class="chapter-duration">~20 min</div>
+            </div>
+            
+            <div class="chapter-item" data-part="3" data-time="3900" onclick="jumpToChapter(13)">
+                <div class="chapter-number">13</div>
+                <div class="chapter-info">
+                    <div class="chapter-title">The Economic Revolution - Work & Wealth</div>
+                    <div class="chapter-time">Part 3 • 1:05:00</div>
+                </div>
+                <div class="chapter-duration">~20 min</div>
+            </div>
+            
+            <div class="chapter-item" data-part="3" data-time="5100" onclick="jumpToChapter(14)">
+                <div class="chapter-number">14</div>
+                <div class="chapter-info">
+                    <div class="chapter-title">Ethics and Existence - Navigating the Future</div>
+                    <div class="chapter-time">Part 3 • 1:25:00</div>
+                </div>
+                <div class="chapter-duration">~20 min</div>
+            </div>
+            
+            <div class="chapter-item" data-part="4" data-time="0" onclick="jumpToChapter(15)">
+                <div class="chapter-number">15</div>
+                <div class="chapter-info">
+                    <div class="chapter-title">The World Beyond 2036 - Long-Term Visions</div>
+                    <div class="chapter-time">Part 4 • 0:00:00</div>
+                </div>
+                <div class="chapter-duration">~25 min</div>
+            </div>
+            
+            <div class="chapter-item" data-part="4" data-time="1500" onclick="jumpToChapter(16)">
+                <div class="chapter-number">C</div>
+                <div class="chapter-info">
+                    <div class="chapter-title">Conclusion: The Decade of Decisions</div>
+                    <div class="chapter-time">Part 4 • 0:25:00</div>
+                </div>
+                <div class="chapter-duration">~15 min</div>
+            </div>
+            
+            <div class="chapter-item" data-part="4" data-time="2400" onclick="jumpToChapter(17)">
+                <div class="chapter-number">R</div>
+                <div class="chapter-info">
+                    <div class="chapter-title">References and Sources</div>
+                    <div class="chapter-time">Part 4 • 0:40:00</div>
+                </div>
+                <div class="chapter-duration">~10 min</div>
+            </div>
+            
+            <div class="chapter-item" data-part="4" data-time="3000" onclick="jumpToChapter(18)">
+                <div class="chapter-number">A</div>
+                <div class="chapter-info">
+                    <div class="chapter-title">Appendices A-I</div>
+                    <div class="chapter-time">Part 4 • 0:50:00</div>
+                </div>
+                <div class="chapter-duration">~30 min</div>
+            </div>
+            
+            <div class="chapter-item" data-part="4" data-time="4800" onclick="jumpToChapter(19)">
+                <div class="chapter-number">19</div>
+                <div class="chapter-info">
+                    <div class="chapter-title">Global Perspectives</div>
+                    <div class="chapter-time">Part 4 • 1:20:00</div>
+                </div>
+                <div class="chapter-duration">~20 min</div>
+            </div>
+            
+            <div class="chapter-item" data-part="4" data-time="6000" onclick="jumpToChapter(20)">
+                <div class="chapter-number">20</div>
+                <div class="chapter-info">
+                    <div class="chapter-title">Data and Evidence</div>
+                    <div class="chapter-time">Part 4 • 1:40:00</div>
+                </div>
+                <div class="chapter-duration">~20 min</div>
+            </div>
+            
+            <div class="chapter-item" data-part="4" data-time="7200" onclick="jumpToChapter(21)">
+                <div class="chapter-number">21</div>
+                <div class="chapter-info">
+                    <div class="chapter-title">The Human Response</div>
+                    <div class="chapter-time">Part 4 • 2:00:00</div>
+                </div>
+                <div class="chapter-duration">~20 min</div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>📚 Listen to any chapter instantly</p>
+            <p style="margin-top:10px">Click a chapter above to jump to that section</p>
+        </div>
+    </div>
+
+    <script>
+        const audio = document.getElementById('audioPlayer');
+        const playBtn = document.getElementById('playBtn');
+        const pauseBtn = document.getElementById('pauseBtn');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const progressBar = document.getElementById('progressBar');
+        const progressFill = document.getElementById('progressFill');
+        const currentTimeEl = document.getElementById('currentTime');
+        const durationEl = document.getElementById('duration');
+        const partIndicator = document.getElementById('partIndicator');
+        
+        const parts = [
+            'The_Next_Decade_Part1.mp3',
+            'The_Next_Decade_Part2.mp3',
+            'The_Next_Decade_Part3.mp3',
+            'The_Next_Decade_Part4.mp3'
+        ];
+        
+        let currentPart = 0;
+        let currentChapter = 0;
+        
+        const chapters = document.querySelectorAll('.chapter-item');
+        
+        function formatTime(seconds) {
+            const h = Math.floor(seconds / 3600);
+            const m = Math.floor((seconds % 3600) / 60);
+            const s = Math.floor(seconds % 60);
+            return `${h}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+        }
+        
+        function loadPart(partNum) {
+            currentPart = partNum;
+            audio.src = parts[partNum];
+            audio.load();
+            partIndicator.textContent = `Part ${partNum + 1} of 4`;
+        }
+        
+        function jumpToChapter(index) {
+            const chapter = chapters[index];
+            const partNum = parseInt(chapter.dataset.part) - 1;
+            const time = parseInt(chapter.dataset.time);
+            
+            // Update active state
+            chapters.forEach(ch => ch.classList.remove('active'));
+            chapter.classList.add('active');
+            currentChapter = index;
+            
+            // Load part and seek to time
+            if (currentPart !== partNum) {
+                loadPart(partNum);
+            }
+            
+            audio.currentTime = time;
+            audio.play();
+            playBtn.style.display = 'none';
+            pauseBtn.style.display = 'inline-block';
+        }
+        
+        playBtn.addEventListener('click', () => {
+            if (!audio.src) {
+                loadPart(0);
+                audio.currentTime = 0;
+            }
+            audio.play();
+            playBtn.style.display = 'none';
+            pauseBtn.style.display = 'inline-block';
+        });
+        
+        pauseBtn.addEventListener('click', () => {
+            audio.pause();
+            pauseBtn.style.display = 'none';
+            playBtn.style.display = 'inline-block';
+        });
+        
+        prevBtn.addEventListener('click', () => {
+            if (currentChapter > 0) {
+                jumpToChapter(currentChapter - 1);
+            }
+        });
+        
+        nextBtn.addEventListener('click', () => {
+            if (currentChapter < chapters.length - 1) {
+                jumpToChapter(currentChapter + 1);
+            }
+        });
+        
+        audio.addEventListener('timeupdate', () => {
+            const progress = (audio.currentTime / audio.duration) * 100;
+            progressFill.style.width = progress + '%';
+            currentTimeEl.textContent = formatTime(audio.currentTime);
+        });
+        
+        audio.addEventListener('loadedmetadata', () => {
+            durationEl.textContent = formatTime(audio.duration);
+        });
+        
+        audio.addEventListener('ended', () => {
+            if (currentChapter < chapters.length - 1) {
+                jumpToChapter(currentChapter + 1);
+            }
+        });
+        
+        progressBar.addEventListener('click', (e) => {
+            const rect = progressBar.getBoundingClientRect();
+            const pos = (e.clientX - rect.left) / rect.width;
+            audio.currentTime = pos * audio.duration;
+        });
+        
+        // Initialize
+        pauseBtn.style.display = 'none';
+        playBtn.style.display = 'inline-block';
+    </script>
+</body>
+</html>
